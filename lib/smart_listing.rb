@@ -97,7 +97,8 @@ module SmartListing
         end
       else
         # let's sort by all attributes
-        @collection = @collection.order(sort_keys.collect{|s| "#{s[1]} #{@sort[s[0]]}" if @sort[s[0]]}.compact) if @sort && @sort.any?
+        # ignore those attributes that are belongs_to relationship
+        @collection = @collection.order(sort_keys.collect{|s| "#{s[1]} #{@sort[s[0]]}" if (@sort[s[0]] and @collection.model.reflections.detect{|x| x[0].to_s == s[1] and x[1].macro == :belongs_to}.nil?)}.compact) if @sort && @sort.any?
 
         if @options[:paginate] && @per_page > 0
           @collection = @collection.page(@page).per(@per_page)
